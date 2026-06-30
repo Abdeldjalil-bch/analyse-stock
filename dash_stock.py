@@ -17,6 +17,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# URL brute GitHub vers le fichier d'exemple (Inventaire stock tonic industrie)
+# ⚠️ Remplacez <USER> et <REPO> par votre nom d'utilisateur / nom de dépôt GitHub réels.
+GITHUB_EXAMPLE_URL = "https://raw.githubusercontent.com/<USER>/<REPO>/main/Inventaire%20stock%20tonic%20industrie.xlsx"
+
 # CSS personnalisé pour une interface moderne
 st.markdown("""
 <style>
@@ -322,7 +326,7 @@ def show_welcome_screen():
     st.markdown("""
     <div class="upload-area">
         <h3>📁 Téléchargez votre fichier Excel</h3>
-        <p>Utilisez le panneau latéral pour charger votre fichier d'inventaire</p>
+        <p>Utilisez le panneau latéral pour charger votre fichier d'inventaire, ou testez l'application avec le jeu de données d'exemple</p>
         <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
             Formats supportés: .xlsx, .xls
         </p>
@@ -371,6 +375,27 @@ def load_data(uploaded_file):
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement du fichier : {str(e)}")
         st.info("💡 Vérifiez que votre fichier est un format Excel valide (.xlsx ou .xls)")
+        return None
+
+@st.cache_data
+def load_data_from_url(url):
+    """Chargement du jeu de données d'exemple depuis GitHub (mise en cache)"""
+    try:
+        df = pd.read_excel(url)
+
+        if df.empty:
+            st.error("❌ Le fichier d'exemple est vide")
+            return None
+
+        df.columns = df.columns.str.strip()
+
+        st.success(f"✅ Exemple chargé avec succès : {len(df)} lignes, {len(df.columns)} colonnes")
+
+        return df
+
+    except Exception as e:
+        st.error(f"❌ Erreur lors du chargement de l'exemple : {str(e)}")
+        st.info("💡 Vérifiez que GITHUB_EXAMPLE_URL pointe vers le fichier .xlsx brut (raw) sur GitHub")
         return None
 
 def format_number(num):
@@ -1077,6 +1102,26 @@ def main():
             type=['xlsx', 'xls'],
             help="Téléchargez votre fichier d'inventaire au format Excel"
         )
+
+        st.markdown(
+            "<p style='text-align:center; color:#888; margin:0.5rem 0;'>— ou —</p>",
+            unsafe_allow_html=True
+        )
+
+        use_example_clicked = st.button(
+            "📂 Utiliser un exemple de base de données",
+            help="Charger le jeu de données d'exemple 'Inventaire stock tonic industrie' depuis GitHub",
+            use_container_width=True
+        )
+
+        if use_example_clicked:
+            st.session_state['source'] = 'example'
+        if uploaded_file is not None:
+            st.session_state['source'] = 'upload'
+
+        if st.session_state.get('source') == 'example' and uploaded_file is None:
+            if st.button("✖️ Quitter l'exemple", use_container_width=True):
+                st.session_state['source'] = None
         
         # Informations sur l'application
         with st.expander("ℹ️ À propos de l'application"):
@@ -1092,10 +1137,14 @@ def main():
             """)
     
     # Chargement et traitement des données
+    df = None
     if uploaded_file is not None:
         df = load_data(uploaded_file)
-        
-        if df is not None and not df.empty:
+    elif st.session_state.get('source') == 'example':
+        df = load_data_from_url(GITHUB_EXAMPLE_URL)
+
+    if df is not None:
+        if not df.empty:
             # Création des filtres
             filters = create_filters(df)
             
