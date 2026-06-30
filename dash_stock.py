@@ -19,7 +19,7 @@ st.set_page_config(
 
 # URL brute GitHub vers le fichier d'exemple (Inventaire stock tonic industrie)
 # ⚠️ Remplacez <USER> et <REPO> par votre nom d'utilisateur / nom de dépôt GitHub réels.
-GITHUB_EXAMPLE_URL = "https://raw.githubusercontent.com/Abdeldjalil-bch/analyse-stock/main/Inventaire%20stock%20tonic%20industrie.xlsx"
+GITHUB_EXAMPLE_URL = "https://github.com/Abdeldjalil-bch/analyse-stock/blob/main/inventaire_stock_tonic_industrie.xlsx"
 
 # CSS personnalisé pour une interface moderne
 st.markdown("""
