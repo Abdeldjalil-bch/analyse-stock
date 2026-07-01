@@ -772,13 +772,15 @@ def create_pivot_analysis(df):
         index_col = st.selectbox(
             "📋 Lignes (Index)", 
             categorical_cols,
-            help="Colonne pour les lignes du tableau"
+            help="Colonne pour les lignes du tableau",
+            index=3
         )
         
         columns_col = st.selectbox(
             "📊 Colonnes", 
             categorical_cols,
-            help="Colonne pour les colonnes du tableau"
+            help="Colonne pour les colonnes du tableau",
+            index = 2
         )
         
         values_col = st.selectbox(
