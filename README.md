@@ -6,6 +6,8 @@
 
 Application web interactive pour l'analyse et la visualisation des données d'inventaire d'entreprise avec Streamlit et Plotly.
 
+## lien vers l'application : https://analyse-stock-cpvaybxkr6yhygnyfxfeka.streamlit.app
+
 ## ✨ Fonctionnalités
 
 - 📈 **Visualisations interactives** : Graphiques dynamiques (barres, secteurs, heatmaps, distributions)
