@@ -19,7 +19,8 @@ st.set_page_config(
 
 # URL brute GitHub vers le fichier d'exemple (Inventaire stock tonic industrie)
 # ⚠️ Remplacez <USER> et <REPO> par votre nom d'utilisateur / nom de dépôt GitHub réels.
-GITHUB_EXAMPLE_URL = "https://raw.githubusercontent.com/Abdeldjalil-bch/analyse-stock/main/inventaire_stock_tonic_industrie.xlsx"
+GITHUB_EXAMPLE_URL = "https://raw.githubusercontent.com/<USER>/<REPO>/main/Inventaire%20stock%20tonic%20industrie.xlsx"
+
 # CSS personnalisé pour une interface moderne
 st.markdown("""
 <style>
@@ -363,8 +364,8 @@ def load_data(uploaded_file):
             st.error("❌ Le fichier est vide")
             return None
             
-        # Nettoyage des noms de colonnes
-        df.columns = df.columns.str.strip()
+        # Nettoyage des noms de colonnes : strip + collapse des espaces multiples internes
+        df.columns = df.columns.str.strip().str.replace(r'\s+', ' ', regex=True)
         
         # Informations sur le dataset
         st.success(f"✅ Fichier chargé avec succès : {len(df)} lignes, {len(df.columns)} colonnes")
@@ -386,7 +387,8 @@ def load_data_from_url(url):
             st.error("❌ Le fichier d'exemple est vide")
             return None
 
-        df.columns = df.columns.str.strip()
+        # Nettoyage des noms de colonnes : strip + collapse des espaces multiples internes
+        df.columns = df.columns.str.strip().str.replace(r'\s+', ' ', regex=True)
 
         st.success(f"✅ Exemple chargé avec succès : {len(df)} lignes, {len(df.columns)} colonnes")
 
@@ -417,7 +419,7 @@ def create_summary_metrics(df):
     # Calculs des métriques
     total_produits = len(df)
     total_montant = df['Montant (DA)'].sum() if 'Montant (DA)' in df.columns else 0
-    total_quantite = df['Qte  (kg)'].sum() if 'Qte  (kg)' in df.columns else 0
+    total_quantite = df['Qte (kg)'].sum() if 'Qte (kg)' in df.columns else 0
     nb_lieux = df['LIEU'].nunique() if 'LIEU' in df.columns else 0
     
     with col1:
@@ -651,7 +653,7 @@ def create_visualizations(df):
         if 'FAMILLE DE PRODUIT' in df.columns:
             famille_analysis = df.groupby('FAMILLE DE PRODUIT').agg({
                 'Montant (DA)': 'sum',
-                'Qte  (kg)': 'sum' if 'Qte  (kg)' in df.columns else 'count'
+                'Qte (kg)': 'sum' if 'Qte (kg)' in df.columns else 'count'
             }).reset_index().sort_values('Montant (DA)', ascending=True)
             
             fig_famille = px.bar(
@@ -660,7 +662,7 @@ def create_visualizations(df):
                 y='FAMILLE DE PRODUIT',
                 orientation='h',
                 title="📦 Valeur par famille de produit",
-                color='Qte  (kg)' if 'Qte  (kg)' in df.columns else 'Montant (DA)',
+                color='Qte (kg)' if 'Qte (kg)' in df.columns else 'Montant (DA)',
                 color_continuous_scale='blues',
                 template='plotly_white'
             )
